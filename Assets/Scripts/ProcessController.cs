@@ -1,7 +1,10 @@
 ﻿using NatCorder.Examples;
 using RenderHeads.Media.AVProVideo;
 using System;
+using System.Collections;
+using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class ProcessController : MonoBehaviour
@@ -124,31 +127,45 @@ public class ProcessController : MonoBehaviour
         //添加音效
         //上传服务器->返回二维码
         //生成二维码
-        processBar.SetActive(true);
+       
         management.CustomConvert(() => {
-            Debug.Log("---------------1------------------");
-            management.OnTrim("00:00:01", "6", () =>
-            {
-                Debug.Log("---------------2------------------");
+            management.OnTrim(string.Format("00:00:0{0}", SeekTime.ToString()), "6", () =>{
+                management.CustomConcatVideos(() =>{
+                    string finalVideo = string.Format("recording_{0}.mp4", DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff"));
+                    management.CustomAddSound(finalVideo, path =>
+                    {
+                        UploadVideo(path);
+                    });
+                });
             });
         });
-        return;
-        management.CustomConvert(() => {
-            management.OnTrim(string.Format("00:00:0{0}", SeekTime.ToString()), "6", () =>
+    }
+
+
+
+
+
+    IEnumerator UploadVideo(string videoPath)
+    {
+        byte[] bytes = File.ReadAllBytes(videoPath);
+        WWWForm form = new WWWForm();
+        int lastIndex = videoPath.LastIndexOf('\\');
+        var name = videoPath.Substring(lastIndex);
+        form.AddBinaryData("files", bytes, name);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://47.105.54.177:8082/api/upload/multi?token=laogehendiao", form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
             {
-                Debug.Log("Trim Over");
-                //management.CustomConcatVideos(() =>
-                //{
-                //    Debug.Log("concat over");
-                //    string finalVideo = string.Format("recording_{0}.avi", DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff"));
-                //    management.CustomAddSound(finalVideo, () =>
-                //    {
-                //        Debug.Log("AddSoundCallback");
-                //    });
-                //});
-            });
-        });
-        
+                //Debug.Log(www.error);
+            }
+            else
+            {
+                //Debug.Log("Form upload complete! "+ www.downloadHandler.text);
+                GameObject.FindObjectOfType<QRCardBehaviour>().Btn_CreatQr(www.downloadHandler.text);
+            }
+        }
     }
 
     void StartRecordCallback()

@@ -44,38 +44,39 @@ public class Management : MonoBehaviour
 
     private void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.Q))
-        //{
-        //    OnTrim("00:00:01", "6", () =>
-        //    {
-        //        Debug.Log("Trim Over");
-        //    });
-        //}
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            OnTrim("00:00:01", "6", () =>
+            {
+                Debug.Log("Trim Over");
+            });
+        }
 
 
-        //if (Input.GetKeyDown(KeyCode.W))
-        //{
-        //    CustomConcatVideos(() =>
-        //    {
-        //        Debug.Log("Concate Over");
-        //    });
-        //}
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            CustomConcatVideos(() =>
+            {
+                Debug.Log("Concate Over");
+            });
+        }
 
-        //if (Input.GetKeyDown(KeyCode.E))
-        //{
-        //    //OnAddSound("time1",() =>
-        //    //{
-        //    //    Debug.Log("Add Sound");
-        //    //});
-        //    //string command = string.Format("-i nosound.mp4 -i audio.mp3 -codec copy -shortest output.avi",);
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            CustomAddSound("time.mp4", path =>
+            {
+                Debug.Log(path);
+            });
 
+        }
 
-        //    CustomAddSound("time", () =>
-        //    {
-        //        Debug.Log("add sound over");
-        //    });
-
-        //}
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            CustomConvert( () =>
+            {
+                Debug.Log("Convert Over");
+            });
+        }
     }
 
 
@@ -84,7 +85,7 @@ public class Management : MonoBehaviour
 
     public void OnTrim(string fromTime, string durationSec, UnityAction trim)
     {
-        tool.TrimVideo(mideVideoFile, srcVideoFile, fromTime, durationSec,bitRate, trim);
+        tool.TrimVideo(mideVideoFile, srcVideoFile, fromTime, durationSec,"10000k", trim);
     }
 
     public void OnAppend( UnityAction appand)
@@ -95,7 +96,7 @@ public class Management : MonoBehaviour
 
 
 
-    public void OnAddSound(string outFile, UnityAction appand)
+    public void OnAddSound(string outFile, UnityAction<string> appand)
     {
         string outFullPath = outFileFolder + outFile+"."+ videoFormart.ToString().ToLower();
         tool.AddSoundToVideo(outFullPath, soundPath, transFormFile, appand,bitRate);
@@ -106,7 +107,7 @@ public class Management : MonoBehaviour
     {
         //-i E:\Project\Project - 2020\LegoTakeVideo\Data\InputVideos\Src.mp4 - q:v 6 - b 16000k - r 25 E:\Project\Project - 2020\LegoTakeVideo\Data\InputVideos\road_1.avi - y
         var src = System.Environment.CurrentDirectory + "/Data/InputVideos//Src.mp4";
-        string command = string.Format("-i {0} -q:v 6 -b 16000k -r 25 {1} -y",src, srcVideoFile);
+        string command = string.Format("-i {0} -q:v 6 -b 10000k -r 25 {1} -y",src, srcVideoFile);
         tool.CustomConvert(command, convert);
     }
 
@@ -118,13 +119,13 @@ public class Management : MonoBehaviour
     }
 
 
-    public void CustomAddSound(string outFile, UnityAction addSound)
+    public void CustomAddSound(string outFile, UnityAction<string> addSound)
     {
         string outFullPath = outFileFolder + outFile;
         //string command = string.Format("-i {0} -i {1} -codec copy -b 5000k {2} -y", transFormFile, soundPath, outFullPath);
         //待定
-        string command = string.Format("-i {0} -i {1}  -b 2000k {2} -y", transFormFile, soundPath, outFullPath);
-        tool.CustomAddSound(command, addSound);
+        string command = string.Format("-i {0} -i {1}  -b 5000k {2} -y", transFormFile, soundPath, outFullPath);
+        tool.CustomAddSound(command, outFullPath, addSound);
     }
 
     private void Start()

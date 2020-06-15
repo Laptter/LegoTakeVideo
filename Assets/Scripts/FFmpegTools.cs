@@ -7,15 +7,18 @@ using System;
 
 public class FFmpegTools : MonoBehaviour, IFFmpegHandler
 {
-    CustomExucuteCommand customConvert;
-    CustomExucuteCommand customConnect;
-    CustomExucuteCommand customTrim;
-    CustomExucuteCommand customAddAudio;
+    //CustomExucuteCommand customConvert;
+    //CustomExucuteCommand customConnect;
+    //CustomExucuteCommand customTrim;
+    //CustomExucuteCommand customAddAudio;
 
 
     private void OnEnable()
     {
-        
+        //customConvert = new CustomExucuteCommand(OnFinish, OnStart, OnFailure, OnProgress, OnSuccess);
+        //customConnect = new CustomExucuteCommand(OnFinish, OnStart, OnFailure, OnProgress, OnSuccess);
+        //customTrim = new CustomExucuteCommand(OnFinish, OnStart, OnFailure, OnProgress, OnSuccess);
+        //customAddAudio = new CustomExucuteCommand(OnFinish, OnStart, OnFailure, OnProgress, OnSuccess);
     }
 
 
@@ -27,11 +30,17 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
 
     UnityAction appandCallback;
     UnityAction trimCallback;
-    UnityAction addSoundCallback;
+    UnityAction<string> addSoundCallback;
     UnityAction convertCallback;
+    string outPath = string.Empty;
     public void TrimVideo(TrimData config, UnityAction trim)
     {
-        this.trimCallback = null; 
+        this.appandCallback = null;
+        this.trimCallback = null;
+        this.addSoundCallback = null;
+        this.convertCallback = null;
+
+
         this.trimCallback = trim;
         FFmpegCommands.Trim(config);
     }
@@ -51,6 +60,10 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
     public void DirectExcuteCommand(string command, UnityAction callback)
     {
         this.appandCallback = null;
+        this.trimCallback = null;
+        this.addSoundCallback = null;
+        this.convertCallback = null;
+
         this.appandCallback = callback;
         FFmpegCommands.DirectInput(command);
     }
@@ -59,6 +72,10 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
     public void CustomConcatVideos(string command, UnityAction concat)
     {
         this.appandCallback = null;
+        this.trimCallback = null;
+        this.addSoundCallback = null;
+        this.convertCallback = null;
+
         this.appandCallback = concat;
         FFmpegCommands.DirectInput(command);
     }
@@ -66,6 +83,10 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
     public void AppendVideo(AppendData config, UnityAction appand, bool fastMode = false)
     {
         this.appandCallback = null;
+        this.trimCallback = null;
+        this.addSoundCallback = null;
+        this.convertCallback = null;
+
         this.appandCallback = appand;
 
         if (fastMode)
@@ -84,16 +105,24 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
     }
 
 
-    public void CustomAddSound(string command, UnityAction addSound)
+    public void CustomAddSound(string command, string outFullPath, UnityAction<string> addSound)
     {
+        this.appandCallback = null;
+        this.trimCallback = null;
         this.addSoundCallback = null;
+        this.convertCallback = null;
+        this.outPath = outFullPath;
         this.addSoundCallback = addSound;
         FFmpegCommands.DirectInput(command);
     }
 
-    public void AddSoundToVideo(SoundData config, UnityAction addSound, bool fastMode = false)
+    public void AddSoundToVideo(SoundData config, UnityAction<string> addSound, bool fastMode = false)
     {
+        this.appandCallback = null;
+        this.trimCallback = null;
         this.addSoundCallback = null;
+        this.convertCallback = null;
+
         this.addSoundCallback = addSound;
 
         if (fastMode)
@@ -102,7 +131,7 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
             FFmpegCommands.AddSoundFull(config);
     }
 
-    public void AddSoundToVideo(string outputPath, string soundPath,string inputPath, UnityAction addSound, string bitRate, bool fastMode=false)
+    public void AddSoundToVideo(string outputPath, string soundPath,string inputPath, UnityAction<string> addSound, string bitRate, bool fastMode=false)
     {
         SoundData config = new SoundData();
         config.outputPath = outputPath;
@@ -114,7 +143,11 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
 
     public void CustomConvert(string command, UnityAction convert)
     {
+        this.appandCallback = null;
+        this.trimCallback = null;
+        this.addSoundCallback = null;
         this.convertCallback = null;
+
         this.convertCallback = convert;
         FFmpegCommands.DirectInput(command);
     }
@@ -140,7 +173,7 @@ public class FFmpegTools : MonoBehaviour, IFFmpegHandler
 
         appandCallback?.Invoke();
         trimCallback?.Invoke();
-        addSoundCallback?.Invoke();
+        addSoundCallback?.Invoke(outPath);
         convertCallback?.Invoke();
     }
 
@@ -168,33 +201,40 @@ public class CustomExucuteCommand : IFFmpegHandler
 {
     UnityAction <string>failureCallback,progressCallback,successCallback;
     UnityAction finishCallback, startCallback;
-    public CustomExucuteCommand(UnityAction finishCallback)
+    public CustomExucuteCommand(UnityAction finishCallback,UnityAction startCallback,
+        UnityAction<string> failureCallback, UnityAction<string> progressCallback, 
+        UnityAction<string> successCallback)
     {
         this.finishCallback = finishCallback;
+        this.startCallback = startCallback;
+        this.failureCallback = failureCallback;
+        this.progressCallback = progressCallback;
+        this.successCallback = successCallback;
     }
     public void OnFailure(string msg)
     {
-        
+        failureCallback?.Invoke(msg);
     }
 
     public void OnFinish()
     {
-        
+        finishCallback?.Invoke();
     }
 
     public void OnProgress(string msg)
     {
         //通知进度
+        progressCallback?.Invoke(msg);
     }
 
     public void OnStart()
     {
-       
+        startCallback?.Invoke();
     }
 
     public void OnSuccess(string msg)
     {
-        
+        successCallback?.Invoke(msg);
     }
 }
 
