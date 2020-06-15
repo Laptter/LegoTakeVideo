@@ -1,0 +1,4 @@
+# File with input videos
+file 'E:\Project\Project-2020\LegoTakeVideo\LegoTakeVideo/Data/InputVideos/First.avi'
+file 'E:\Project\Project-2020\LegoTakeVideo\LegoTakeVideo/Data/InputVideos/Mid.avi'
+file 'E:\Project\Project-2020\LegoTakeVideo\LegoTakeVideo/Data/InputVideos/Last.avi'
