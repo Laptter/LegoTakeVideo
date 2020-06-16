@@ -33,6 +33,22 @@ public class CustomProgress : MonoBehaviour, IFFmpegHandler
         }
     }
 
+    public void BeforeUpLoad()
+    {
+        success = null;
+        progressBar.color = normalColor;
+        durationBuffer = progress = 0;
+        UpdateBar();
+        progressField.text = "Started UpLoad.";
+    }
+
+    public void OnUpLoadProgres(float prog)
+    {
+        progress = prog;
+        progressField.text = "UpLoadProgress: " + (int)(progress * 100) + "% / 100%";
+        UpdateBar();
+    }
+
     public void OnFailure(string msg)
     {
         OnProgress(msg);

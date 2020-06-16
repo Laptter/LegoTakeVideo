@@ -1,3 +1,3 @@
-file 'F:\CompanyProject\HeYou\LegoTakeVideo\Data\InputVideos/First.avi'
-file 'F:\CompanyProject\HeYou\LegoTakeVideo\Data\InputVideos/Mid.avi'
-file 'F:\CompanyProject\HeYou\LegoTakeVideo\Data\InputVideos/Last.avi'
+file 'E:\Project\Project-2020\LegoTakeVideo\Data\InputVideos/First.avi'
+file 'E:\Project\Project-2020\LegoTakeVideo\Data\InputVideos/Mid.avi'
+file 'E:\Project\Project-2020\LegoTakeVideo\Data\InputVideos/Last.avi'
